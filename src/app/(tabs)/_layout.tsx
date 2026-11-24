@@ -9,7 +9,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Palette.primary,
+        tabBarActiveTintColor: '#1D4ED8',
         tabBarInactiveTintColor: '#64748B',
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
@@ -19,7 +19,7 @@ export default function TabLayout() {
           paddingBottom: Platform.OS === 'ios' ? 24 : 10,
           paddingTop: 8,
           elevation: 6,
-          shadowColor: Palette.primary,
+          shadowColor: '#1D4ED8',
           shadowOffset: { width: 0, height: -2 },
           shadowOpacity: 0.08,
           shadowRadius: 6,
@@ -36,7 +36,7 @@ export default function TabLayout() {
         options={{
           title: 'የጤና ካርድ',
           tabBarIcon: ({ color, focused }: any) => (
-            <Ionicons name={focused ? 'card' : 'card-outline'} size={22} color={color || Palette.primary} />
+            <Ionicons name={focused ? 'card' : 'card-outline'} size={22} color={color || '#1D4ED8'} />
           ),
         }}
       />
@@ -45,7 +45,7 @@ export default function TabLayout() {
         options={{
           title: 'ማረጋገጫ (Triage)',
           tabBarIcon: ({ color, focused }: any) => (
-            <Ionicons name={focused ? 'qr-code' : 'qr-code-outline'} size={22} color={color || Palette.primary} />
+            <Ionicons name={focused ? 'qr-code' : 'qr-code-outline'} size={22} color={color || '#1D4ED8'} />
           ),
         }}
       />
@@ -54,7 +54,7 @@ export default function TabLayout() {
         options={{
           title: 'አገልግሎቶች',
           tabBarIcon: ({ color, focused }: any) => (
-            <Ionicons name={focused ? 'medical' : 'medical-outline'} size={22} color={color || Palette.primary} />
+            <Ionicons name={focused ? 'medical' : 'medical-outline'} size={22} color={color || '#1D4ED8'} />
           ),
         }}
       />
@@ -63,7 +63,7 @@ export default function TabLayout() {
         options={{
           title: 'ቅሬታ (Form 001)',
           tabBarIcon: ({ color, focused }: any) => (
-            <Ionicons name={focused ? 'alert-circle' : 'alert-circle-outline'} size={22} color={color || Palette.primary} />
+            <Ionicons name={focused ? 'document-text' : 'document-text-outline'} size={22} color={color || '#1D4ED8'} />
           ),
         }}
       />

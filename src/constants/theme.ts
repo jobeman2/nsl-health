@@ -1,14 +1,14 @@
 import { Platform } from 'react-native';
 
 export const Palette = {
-  // Medical Forest Green & Mint Emerald palette
-  primary: '#0A5C36',         // Medical Forest Green
-  primaryDark: '#052E16',
-  primaryLight: '#15803D',
-  primaryAccent: '#10B981',   // Mint Emerald
-  primarySoft: '#ECFDF5',     // Soft Mint background
-  primaryMuted: '#D1FAE5',
-  primaryBorder: '#A7F3D0',
+  // Modern Municipal Cobalt & Deep Navy Palette
+  primary: '#1D4ED8',         // Modern Cobalt Blue
+  primaryDark: '#0F172A',     // Slate Navy 900
+  primaryLight: '#2563EB',    // Bright Royal Blue
+  primaryAccent: '#3B82F6',   // Vivid Blue
+  primarySoft: '#EFF6FF',     // Soft Blue Background (Blue 50)
+  primaryMuted: '#DBEAFE',    // Blue 100
+  primaryBorder: '#BFDBFE',   // Blue 200
 
   subsidizedGold: '#B45309',
   subsidizedSoft: '#FEF3C7',
@@ -26,9 +26,9 @@ export const Palette = {
   goldLight: '#FEF3C7',
   goldBorder: '#FDE68A',
 
-  heroAlert: '#0A5C36',
-  heroAlertRing: 'rgba(10, 92, 54, 0.12)',
-  heroAlertBorder: 'rgba(10, 92, 54, 0.22)',
+  heroAlert: '#1D4ED8',
+  heroAlertRing: 'rgba(29, 78, 216, 0.12)',
+  heroAlertBorder: 'rgba(29, 78, 216, 0.22)',
 
   // Surface and slate neutrals
   zinc50: '#F8FAFC',
@@ -51,10 +51,10 @@ export const Palette = {
   // CBHI Status tokens
   status: {
     active: {
-      bg: '#ECFDF5',
-      border: '#A7F3D0',
-      text: '#047857',
-      dot: '#10B981',
+      bg: '#EFF6FF',
+      border: '#BFDBFE',
+      text: '#1D4ED8',
+      dot: '#2563EB',
     },
     subsidized: {
       bg: '#FEF3C7',
@@ -122,7 +122,7 @@ export const Colors = {
     inputBorder: '#E2E8F0',
     inputPlaceholder: '#94A3B8',
     backgroundElement: Palette.primarySoft,
-    backgroundSelected: '#D1FAE5',
+    backgroundSelected: '#DBEAFE',
     destructive: '#DC2626',
     tint: Palette.primary,
     icon: '#64748B',
@@ -138,20 +138,20 @@ export const Colors = {
     textMuted: '#64748B',
     border: '#334155',
     borderMuted: '#1E293B',
-    primary: '#10B981',
+    primary: '#3B82F6',
     primaryForeground: '#FFFFFF',
     secondary: '#1E293B',
-    secondaryForeground: '#A7F3D0',
+    secondaryForeground: '#BFDBFE',
     input: '#1E293B',
     inputBorder: '#334155',
     inputPlaceholder: '#64748B',
     backgroundElement: '#1E293B',
-    backgroundSelected: '#064E3B',
+    backgroundSelected: '#1E3A8A',
     destructive: '#EF4444',
-    tint: '#10B981',
+    tint: '#3B82F6',
     icon: '#94A3B8',
     tabIconDefault: '#94A3B8',
-    tabIconSelected: '#10B981',
+    tabIconSelected: '#3B82F6',
   },
 } as const;
 
@@ -255,25 +255,25 @@ export const Shadows = {
     elevation: 1,
   },
   sm: {
-    shadowColor: '#000',
+    shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.07,
+    shadowOpacity: 0.06,
     shadowRadius: 5,
     elevation: 2,
   },
   md: {
-    shadowColor: '#000',
+    shadowColor: '#1D4ED8',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 10,
     elevation: 4,
   },
   lg: {
-    shadowColor: '#0A5C36',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.14,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowColor: '#1D4ED8',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 14,
+    elevation: 6,
   },
 };
 

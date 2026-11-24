@@ -63,8 +63,6 @@ export function HeaderBar({
   const handleNotification = () => {
     if (onNotificationPress) {
       onNotificationPress();
-    } else {
-      router.push('/notifications');
     }
   };
 

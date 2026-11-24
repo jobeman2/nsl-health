@@ -38,7 +38,7 @@ export default function ServicesScreen() {
       <View style={styles.header}>
         <View style={styles.headerTitleRow}>
           <View style={styles.iconBox}>
-            <Ionicons name="business" size={20} color="#10B981" />
+            <Ionicons name="business" size={20} color="#1D4ED8" />
           </View>
           <View>
             <Text style={styles.headerTitleAm}>የጤና ጣቢያዎችና የአገልግሎት ሽፋን</Text>
@@ -107,7 +107,7 @@ export default function ServicesScreen() {
                       <Text style={styles.facilityNameAm}>{facility.nameAm}</Text>
                       <Text style={styles.facilityNameEn}>{facility.nameEn}</Text>
                       <View style={styles.woredaBadge}>
-                        <Ionicons name="location" size={12} color="#059669" />
+                        <Ionicons name="location" size={12} color="#1D4ED8" />
                         <Text style={styles.woredaText}>{facility.woreda}</Text>
                       </View>
                     </View>
@@ -116,7 +116,7 @@ export default function ServicesScreen() {
                       style={styles.callDeskBtn}
                       onPress={() => handleCall(facility.phone)}
                     >
-                      <Ionicons name="call" size={16} color="#FFFFFF" />
+                      <Ionicons name="call" size={15} color="#FFFFFF" />
                       <Text style={styles.callDeskBtnText}>ደውል</Text>
                     </TouchableOpacity>
                   </View>
@@ -131,7 +131,7 @@ export default function ServicesScreen() {
                       <Text style={styles.detailText}>{facility.openHours}</Text>
                     </View>
                     <View style={styles.detailRow}>
-                      <Ionicons name="person-outline" size={14} color="#0A5C36" />
+                      <Ionicons name="person-outline" size={14} color="#1D4ED8" />
                       <Text style={styles.detailTextHighlight}>
                         CBHI ዴስክ: {facility.cbhiDeskContact}
                       </Text>
@@ -147,12 +147,12 @@ export default function ServicesScreen() {
                     ))}
                   </View>
 
-                  {/* Referral Line */}
+                  {/* Referral Hospital Line */}
                   <View style={styles.referralFooter}>
-                    <Ionicons name="arrow-redo" size={13} color="#0A5C36" />
+                    <Ionicons name="arrow-redo" size={13} color="#1D4ED8" />
                     <Text style={styles.referralText}>
-                      የሪፈራል ሆስፒታል:{' '}
-                      <Text style={{ fontWeight: '700', color: '#0A5C36' }}>
+                      የሪፈራል ማዕከል:{' '}
+                      <Text style={{ fontWeight: '700', color: '#1D4ED8' }}>
                         {facility.referralDestination}
                       </Text>
                     </Text>
@@ -165,7 +165,7 @@ export default function ServicesScreen() {
           /* Benefits & Formulary Tab */
           <View style={styles.benefitsContainer}>
             <View style={styles.benefitNoticeBox}>
-              <Ionicons name="shield-checkmark" size={24} color="#059669" />
+              <Ionicons name="shield-checkmark" size={24} color="#1D4ED8" />
               <View style={{ flex: 1, marginLeft: 10 }}>
                 <Text style={styles.benefitNoticeTitle}>
                   የንፋስ ስልክ ላፍቶ ማህበረሰብ አቀፍ ጤና መድህን ጥቅማጥቅሞች
@@ -180,7 +180,7 @@ export default function ServicesScreen() {
               <View key={index} style={styles.benefitCard}>
                 <View style={styles.benefitCardHeader}>
                   <View style={styles.benefitIconBox}>
-                    <Ionicons name={item.icon as any} size={22} color="#0A5C36" />
+                    <Ionicons name={item.icon as any} size={22} color="#1D4ED8" />
                   </View>
                   <View style={{ flex: 1, marginLeft: 12 }}>
                     <Text style={styles.benefitCardAm}>{item.categoryAm}</Text>
@@ -189,7 +189,7 @@ export default function ServicesScreen() {
                 </View>
 
                 <View style={styles.coveragePill}>
-                  <Ionicons name="checkmark-done" size={14} color="#047857" />
+                  <Ionicons name="checkmark-done" size={14} color="#1D4ED8" />
                   <Text style={styles.coveragePillText}>{item.coverage}</Text>
                 </View>
 
@@ -222,10 +222,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   iconBox: {
-    width: 36,
-    height: 36,
+    width: 34,
+    height: 34,
     borderRadius: 8,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EFF6FF',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   segmentTextActive: {
-    color: '#0A5C36',
+    color: '#1D4ED8',
     fontWeight: '700',
   },
   scrollContent: {
@@ -329,12 +329,12 @@ const styles = StyleSheet.create({
   woredaText: {
     fontFamily: Fonts.medium,
     fontSize: 11,
-    color: '#059669',
+    color: '#1D4ED8',
   },
   callDeskBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0A5C36',
+    backgroundColor: '#1D4ED8',
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 8,
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
   detailTextHighlight: {
     fontFamily: Fonts.medium,
     fontSize: 11,
-    color: '#0A5C36',
+    color: '#1D4ED8',
   },
   servicesPillWrap: {
     flexDirection: 'row',
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   servicePill: {
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EFF6FF',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
   servicePillText: {
     fontFamily: Fonts.regular,
     fontSize: 9.5,
-    color: '#065F46',
+    color: '#1E40AF',
   },
   referralFooter: {
     flexDirection: 'row',
@@ -403,9 +403,9 @@ const styles = StyleSheet.create({
   benefitNoticeBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EFF6FF',
     borderWidth: 1,
-    borderColor: '#A7F3D0',
+    borderColor: '#BFDBFE',
     borderRadius: 14,
     padding: 12,
     marginBottom: 6,
@@ -413,12 +413,12 @@ const styles = StyleSheet.create({
   benefitNoticeTitle: {
     fontFamily: Fonts.bold,
     fontSize: 12,
-    color: '#065F46',
+    color: '#1E40AF',
   },
   benefitNoticeSub: {
     fontFamily: Fonts.regular,
     fontSize: 10.5,
-    color: '#047857',
+    color: '#1D4ED8',
     marginTop: 2,
     lineHeight: 14,
   },
@@ -435,10 +435,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   benefitIconBox: {
-    width: 40,
-    height: 40,
+    width: 38,
+    height: 38,
     borderRadius: 10,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EFF6FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
   coveragePill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0FDF4',
+    backgroundColor: '#EFF6FF',
     alignSelf: 'flex-start',
     paddingHorizontal: 8,
     paddingVertical: 3,
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   coveragePillText: {
     fontFamily: Fonts.bold,
     fontSize: 10.5,
-    color: '#15803D',
+    color: '#1D4ED8',
   },
   benefitCardDesc: {
     fontFamily: Fonts.regular,

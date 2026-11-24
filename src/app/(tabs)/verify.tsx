@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { Fonts, Palette, MUNICIPAL_HEADER } from '@/constants/theme';
+import { Fonts, Palette } from '@/constants/theme';
 import { useCBHIStore } from '@/stores/cbhi-store';
 
 export default function ClinicVerificationScreen() {
@@ -37,7 +37,7 @@ export default function ClinicVerificationScreen() {
         dependentsCount: member.dependents.length,
         dependents: member.dependents,
       });
-    }, 900);
+    }, 700);
   };
 
   const handleAuthorizeVisit = () => {
@@ -53,12 +53,12 @@ export default function ClinicVerificationScreen() {
       triageNotes:
         scannedResult.policyStatus === 'EXPIRED'
           ? 'አባልነቱ ያለቀበት በመሆኑ ማደስ አለበት (Copay required)'
-          : 'OPD Consultation & Pharmacy Voucher Authorized',
+          : 'የተመላላሽ ታካሚ (OPD) ህክምና እና የፋርማሲ ቫውቸር ተፈቅዷል',
     };
 
     recordVerification(newRecord);
     Alert.alert(
-      'የታካሚ ማረጋገጫ ተጠናቋል!',
+      'የታካሚ ማረጋገጫ ተጠናቋል',
       `${scannedResult.fullNameAm} ወደ ህክምና ክፍል እንዲያልፉ በሲስተሙ ተመዝግቧል።`,
       [{ text: 'እሺ' }]
     );
@@ -69,12 +69,12 @@ export default function ClinicVerificationScreen() {
       {/* Header Bar */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <View style={styles.clinicIconBox}>
-            <Ionicons name="scan" size={20} color="#10B981" />
+          <View style={styles.iconBox}>
+            <Ionicons name="scan" size={20} color="#1D4ED8" />
           </View>
           <View>
-            <Text style={styles.headerTitleAm}>የጤና ጣቢያ ትሪያጅ ስካነር</Text>
-            <Text style={styles.headerTitleEn}>Clinic Triage & Anti-Fraud Scanner</Text>
+            <Text style={styles.headerTitleAm}>የጤና ጣቢያ ትሪያጅ ማረጋገጫ</Text>
+            <Text style={styles.headerTitleEn}>Clinic Triage & Verification Scanner</Text>
           </View>
         </View>
         <View style={styles.clinicBadge}>
@@ -83,7 +83,7 @@ export default function ClinicVerificationScreen() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Scanner Simulation Viewport */}
+        {/* Scanner Viewport */}
         <View style={styles.scannerBox}>
           <View style={styles.scannerViewport}>
             <View style={styles.reticleCornerTL} />
@@ -94,8 +94,8 @@ export default function ClinicVerificationScreen() {
             <View style={styles.scannerCenter}>
               <Ionicons
                 name={isScanning ? 'hourglass-outline' : 'qr-code-outline'}
-                size={64}
-                color={isScanning ? '#10B981' : 'rgba(255, 255, 255, 0.4)'}
+                size={58}
+                color={isScanning ? '#3B82F6' : 'rgba(255, 255, 255, 0.4)'}
               />
               <Text style={styles.scannerHint}>
                 {isScanning ? 'ኮዱን በማጣራት ላይ...' : 'የታካሚውን የጤና መድህን QR ኮድ እዚህ ያነጣጥሩ'}
@@ -113,15 +113,15 @@ export default function ClinicVerificationScreen() {
             >
               <Ionicons name="camera" size={18} color="#FFFFFF" />
               <Text style={styles.triggerScanText}>
-                {isScanning ? 'በማንበብ ላይ...' : 'በካሜራ ስካን አድርግ (Scan QR)'}
+                {isScanning ? 'በማንበብ ላይ...' : 'ስካን አድርግ (Scan QR)'}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Manual Lookup Option */}
+        {/* Manual Lookup */}
         <View style={styles.manualSearchBox}>
-          <Text style={styles.manualSearchLabel}>ወይም በመታወቂያ ቁጥር ይፈልጉ (Manual Lookup):</Text>
+          <Text style={styles.manualSearchLabel}>ወይም በመታወቂያ ቁጥር ይፈልጉ:</Text>
           <View style={styles.manualInputRow}>
             <TextInput
               style={styles.manualInput}
@@ -137,7 +137,7 @@ export default function ClinicVerificationScreen() {
           </View>
         </View>
 
-        {/* Verification Card Result */}
+        {/* Verification Result Card */}
         {scannedResult && (
           <View
             style={[
@@ -153,31 +153,31 @@ export default function ClinicVerificationScreen() {
                       ? 'close-circle'
                       : 'checkmark-circle'
                   }
-                  size={24}
-                  color={scannedResult.policyStatus === 'EXPIRED' ? '#DC2626' : '#059669'}
+                  size={22}
+                  color={scannedResult.policyStatus === 'EXPIRED' ? '#DC2626' : '#2563EB'}
                 />
                 <View style={{ marginLeft: 8 }}>
                   <Text style={styles.resultStatusText}>
                     {scannedResult.policyStatus === 'EXPIRED'
-                      ? 'ያልታደሰ / ክፍያ ያለቀበት (INELIGIBLE)'
+                      ? 'ያልታደሰ አባል (INELIGIBLE)'
                       : 'የተረጋገጠ አባል (ELIGIBLE - 100% COVERED)'}
                   </Text>
                   <Text style={styles.resultSubText}>
-                    የማረጋገጫ ሰነድ: {scannedResult.memberId}
+                    የአባል መታወቂያ: {scannedResult.memberId}
                   </Text>
                 </View>
               </View>
             </View>
 
-            {/* Photo Comparison (Anti Card Sharing) */}
+            {/* Photo Comparison */}
             <View style={styles.photoCompareSection}>
               <Image source={{ uri: scannedResult.photoUrl }} style={styles.comparePhoto} />
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.compareNotice}>ፎቶ ማመሳከሪያ (Anti-Fraud Identity Check):</Text>
+                <Text style={styles.compareNotice}>የፎቶ ማረጋገጫ:</Text>
                 <Text style={styles.patientNameAm}>{scannedResult.fullNameAm}</Text>
                 <Text style={styles.patientNameEn}>{scannedResult.fullNameEn}</Text>
                 <Text style={styles.patientWoreda}>ወረዳ: {scannedResult.woreda}</Text>
-                <Text style={styles.patientClinic}>የተመደበበት ጤና ጣቢያ: {scannedResult.assignedClinic}</Text>
+                <Text style={styles.patientClinic}>የተመደበበት: {scannedResult.assignedClinic}</Text>
               </View>
             </View>
 
@@ -188,7 +188,7 @@ export default function ClinicVerificationScreen() {
               </Text>
               {scannedResult.dependents.map((d: any) => (
                 <View key={d.id} style={styles.depRow}>
-                  <Ionicons name="person-outline" size={14} color="#0A5C36" />
+                  <Ionicons name="person-outline" size={13} color="#1D4ED8" />
                   <Text style={styles.depRowText}>
                     {d.nameAm} ({d.relationship}) — {d.age} ዓመት
                   </Text>
@@ -204,11 +204,11 @@ export default function ClinicVerificationScreen() {
               ]}
               onPress={handleAuthorizeVisit}
             >
-              <Ionicons name="checkbox" size={20} color="#FFFFFF" />
+              <Ionicons name="checkmark-circle" size={18} color="#FFFFFF" />
               <Text style={styles.authorizeBtnText}>
                 {scannedResult.policyStatus === 'EXPIRED'
                   ? 'አባልነት ስላለቀበት ህክምና አይፈቀድም'
-                  : 'ምርመራና ህክምና ፍቀድ (Authorize Visit)'}
+                  : 'ህክምና ፍቀድ (Authorize Visit)'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -235,7 +235,7 @@ export default function ClinicVerificationScreen() {
                   <Text
                     style={[
                       styles.historyPillText,
-                      v.status === 'ELIGIBLE' ? { color: '#047857' } : { color: '#B91C1C' },
+                      v.status === 'ELIGIBLE' ? { color: '#1D4ED8' } : { color: '#B91C1C' },
                     ]}
                   >
                     {v.status === 'ELIGIBLE' ? 'ተፈቅዷል' : 'ተከልክሏል'}
@@ -270,11 +270,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  clinicIconBox: {
-    width: 36,
-    height: 36,
+  iconBox: {
+    width: 34,
+    height: 34,
     borderRadius: 8,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EFF6FF',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   clinicBadge: {
-    backgroundColor: '#052E16',
+    backgroundColor: '#1E3A8A',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   clinicBadgeText: {
     fontFamily: Fonts.bold,
     fontSize: 11,
-    color: '#A7F3D0',
+    color: '#DBEAFE',
   },
   scrollContent: {
     padding: 16,
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   scannerViewport: {
-    height: 200,
+    height: 190,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     height: 24,
     borderTopWidth: 3,
     borderLeftWidth: 3,
-    borderColor: '#10B981',
+    borderColor: '#3B82F6',
   },
   reticleCornerTR: {
     position: 'absolute',
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     height: 24,
     borderTopWidth: 3,
     borderRightWidth: 3,
-    borderColor: '#10B981',
+    borderColor: '#3B82F6',
   },
   reticleCornerBL: {
     position: 'absolute',
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
     height: 24,
     borderBottomWidth: 3,
     borderLeftWidth: 3,
-    borderColor: '#10B981',
+    borderColor: '#3B82F6',
   },
   reticleCornerBR: {
     position: 'absolute',
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     height: 24,
     borderBottomWidth: 3,
     borderRightWidth: 3,
-    borderColor: '#10B981',
+    borderColor: '#3B82F6',
   },
   scannerCenter: {
     alignItems: 'center',
@@ -371,8 +371,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '70%',
     height: 2,
-    backgroundColor: '#10B981',
-    shadowColor: '#10B981',
+    backgroundColor: '#3B82F6',
+    shadowColor: '#3B82F6',
     shadowOpacity: 0.9,
     shadowRadius: 6,
     elevation: 4,
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0A5C36',
+    backgroundColor: '#1D4ED8',
     paddingVertical: 10,
     borderRadius: 10,
     gap: 8,
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     color: '#0F172A',
   },
   searchBtn: {
-    backgroundColor: '#0A5C36',
+    backgroundColor: '#1D4ED8',
     width: 44,
     borderRadius: 8,
     alignItems: 'center',
@@ -436,10 +436,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: '#10B981',
+    borderColor: '#3B82F6',
     padding: 14,
     marginBottom: 16,
-    shadowColor: '#059669',
+    shadowColor: '#1D4ED8',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
@@ -447,7 +447,6 @@ const styles = StyleSheet.create({
   },
   resultCardExpired: {
     borderColor: '#EF4444',
-    shadowColor: '#EF4444',
   },
   resultHeader: {
     borderBottomWidth: 1,
@@ -458,7 +457,7 @@ const styles = StyleSheet.create({
   resultStatusText: {
     fontFamily: Fonts.bold,
     fontSize: 13,
-    color: '#059669',
+    color: '#1D4ED8',
   },
   resultSubText: {
     fontFamily: Fonts.regular,
@@ -478,12 +477,12 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#10B981',
+    borderColor: '#3B82F6',
   },
   compareNotice: {
     fontFamily: Fonts.bold,
     fontSize: 10,
-    color: '#0A5C36',
+    color: '#1D4ED8',
   },
   patientNameAm: {
     fontFamily: Fonts.bold,
@@ -505,7 +504,7 @@ const styles = StyleSheet.create({
   patientClinic: {
     fontFamily: Fonts.medium,
     fontSize: 10.5,
-    color: '#047857',
+    color: '#1D4ED8',
   },
   depSnapshot: {
     backgroundColor: '#F1F5F9',
@@ -534,7 +533,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0A5C36',
+    backgroundColor: '#1D4ED8',
     paddingVertical: 12,
     borderRadius: 10,
     gap: 8,
@@ -585,7 +584,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   historyPillOk: {
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EFF6FF',
   },
   historyPillBad: {
     backgroundColor: '#FEE2E2',

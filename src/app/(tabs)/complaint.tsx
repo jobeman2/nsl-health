@@ -19,7 +19,7 @@ import { NSL_FACILITIES } from '@/constants/facilities';
 const INCIDENT_TYPES = [
   { id: 'SERVICE_DENIAL', labelAm: 'አገልግሎት መከልከል / ማጉላላት', labelEn: 'Service Denial' },
   { id: 'MEDICATION_STOCKOUT', labelAm: 'የመድሃኒት እጥረት / ወደ ውጪ ማዘዝ', labelEn: 'Drug Stockout' },
-  { id: 'ILLEGAL_FEE', labelAm: 'ህገ-ወጥ ክፍያ መጠየቅ (Under-table)', labelEn: 'Illegal Fee' },
+  { id: 'ILLEGAL_FEE', labelAm: 'ህገ-ወጥ ክፍያ መጠየቅ', labelEn: 'Illegal Fee' },
   { id: 'MISTREATMENT', labelAm: 'ያልተገባ ስነ-ምግባር / ቸልተኝነት', labelEn: 'Staff Misconduct' },
   { id: 'QUALITY_DEFECT', labelAm: 'የላቦራቶሪ / የህክምና ጥራት ጉድለት', labelEn: 'Clinical Quality' },
 ];
@@ -79,7 +79,7 @@ export default function ComplaintScreen() {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.iconBox}>
-            <Ionicons name="document-text" size={20} color="#DC2626" />
+            <Ionicons name="document-text" size={20} color="#1D4ED8" />
           </View>
           <View>
             <Text style={styles.headerTitleAm}>የታካሚ አቤቱታና ጥቆማ ማቅረቢያ</Text>
@@ -94,8 +94,8 @@ export default function ComplaintScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {submissionSuccess ? (
           <View style={styles.successCard}>
-            <Ionicons name="checkmark-circle" size={54} color="#059669" />
-            <Text style={styles.successTitleAm}>አቤቱታዎ በተሳካ ሁኔታ ደርሷል!</Text>
+            <Ionicons name="checkmark-circle" size={54} color="#1D4ED8" />
+            <Text style={styles.successTitleAm}>አቤቱታዎ በተሳካ ሁኔታ ደርሷል</Text>
             <Text style={styles.successTitleEn}>Grievance Registered Successfully</Text>
 
             <View style={styles.successRefBox}>
@@ -104,7 +104,7 @@ export default function ComplaintScreen() {
             </View>
 
             <Text style={styles.successDesc}>
-              አቤቱታዎ በቀጥታ ለንፋስ ስልክ ላፍቶ ክፍለ ከተማ ጤና ጽ/ቤት የጥራትና ደንብ ቁጥጥር ቡድን (Quality & Regulatory Case Team) ተልኳል። በ 48 ሰዓት ውስጥ ምላሽ ይሰጥበታል።
+              አቤቱታዎ በቀጥታ ለንፋስ ስልክ ላፍቶ ክፍለ ከተማ ጤና ጽ/ቤት የጥራትና ደንብ ቁጥጥር ቡድን ተልኳል። በ 48 ሰዓት ውስጥ ምላሽ ይሰጥበታል።
             </Text>
 
             <TouchableOpacity style={styles.newGrievanceBtn} onPress={handleReset}>
@@ -113,9 +113,9 @@ export default function ComplaintScreen() {
           </View>
         ) : (
           <>
-            {/* Explanatory Banner */}
+            {/* Informational Banner */}
             <View style={styles.lawBanner}>
-              <Ionicons name="shield" size={20} color="#0A5C36" />
+              <Ionicons name="shield-checkmark" size={20} color="#1D4ED8" />
               <View style={{ flex: 1, marginLeft: 8 }}>
                 <Text style={styles.lawBannerTitle}>የመድህን አባላት ህጋዊ መብት ጥበቃ</Text>
                 <Text style={styles.lawBannerSub}>
@@ -126,7 +126,7 @@ export default function ComplaintScreen() {
 
             {/* Form Fields */}
             <View style={styles.formCard}>
-              {/* Member ID & Name (Readonly from verified card) */}
+              {/* Member ID & Name */}
               <View style={styles.formRow}>
                 <View style={{ flex: 1, marginRight: 8 }}>
                   <Text style={styles.label}>የአመልካች ስም</Text>
@@ -184,7 +184,7 @@ export default function ComplaintScreen() {
                         <Ionicons
                           name={isChosen ? 'radio-button-on' : 'radio-button-off'}
                           size={18}
-                          color={isChosen ? '#0A5C36' : '#94A3B8'}
+                          color={isChosen ? '#1D4ED8' : '#94A3B8'}
                         />
                         <View style={{ flex: 1, marginLeft: 8 }}>
                           <Text style={[styles.incidentOptionAm, isChosen && styles.incidentOptionAmActive]}>
@@ -234,7 +234,7 @@ export default function ComplaintScreen() {
                   <ActivityIndicator size="small" color="#FFFFFF" />
                 ) : (
                   <>
-                    <Ionicons name="send" size={18} color="#FFFFFF" />
+                    <Ionicons name="send" size={17} color="#FFFFFF" />
                     <Text style={styles.submitBtnText}>አቤቱታውን ላክ (Submit Form 001)</Text>
                   </>
                 )}
@@ -267,10 +267,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconBox: {
-    width: 36,
-    height: 36,
+    width: 34,
+    height: 34,
     borderRadius: 8,
-    backgroundColor: '#FEE2E2',
+    backgroundColor: '#EFF6FF',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -286,9 +286,9 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   legalBadge: {
-    backgroundColor: '#FEF2F2',
+    backgroundColor: '#EFF6FF',
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: '#BFDBFE',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   legalBadgeText: {
     fontFamily: Fonts.bold,
     fontSize: 10.5,
-    color: '#DC2626',
+    color: '#1D4ED8',
   },
   scrollContent: {
     padding: 16,
@@ -305,9 +305,9 @@ const styles = StyleSheet.create({
   lawBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EFF6FF',
     borderWidth: 1,
-    borderColor: '#A7F3D0',
+    borderColor: '#BFDBFE',
     borderRadius: 12,
     padding: 12,
     marginBottom: 16,
@@ -315,12 +315,12 @@ const styles = StyleSheet.create({
   lawBannerTitle: {
     fontFamily: Fonts.bold,
     fontSize: 12,
-    color: '#065F46',
+    color: '#1E40AF',
   },
   lawBannerSub: {
     fontFamily: Fonts.regular,
     fontSize: 10.5,
-    color: '#047857',
+    color: '#1D4ED8',
     marginTop: 2,
     lineHeight: 14,
   },
@@ -380,8 +380,8 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   facilityChipActive: {
-    backgroundColor: '#ECFDF5',
-    borderColor: '#10B981',
+    backgroundColor: '#EFF6FF',
+    borderColor: '#3B82F6',
   },
   facilityChipText: {
     fontFamily: Fonts.regular,
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     color: '#475569',
   },
   facilityChipTextActive: {
-    color: '#047857',
+    color: '#1D4ED8',
     fontWeight: '700',
   },
   incidentTypesList: {
@@ -405,8 +405,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   incidentOptionChosen: {
-    backgroundColor: '#ECFDF5',
-    borderColor: '#0A5C36',
+    backgroundColor: '#EFF6FF',
+    borderColor: '#1D4ED8',
   },
   incidentOptionAm: {
     fontFamily: Fonts.medium,
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
     color: '#0F172A',
   },
   incidentOptionAmActive: {
-    color: '#0A5C36',
+    color: '#1D4ED8',
     fontWeight: '700',
   },
   incidentOptionEn: {
@@ -426,7 +426,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0A5C36',
+    backgroundColor: '#1D4ED8',
     paddingVertical: 12,
     borderRadius: 10,
     gap: 8,
@@ -461,9 +461,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   successRefBox: {
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EFF6FF',
     borderWidth: 1,
-    borderColor: '#A7F3D0',
+    borderColor: '#BFDBFE',
     borderRadius: 12,
     padding: 14,
     width: '100%',
@@ -473,13 +473,13 @@ const styles = StyleSheet.create({
   successRefLabel: {
     fontFamily: Fonts.regular,
     fontSize: 11,
-    color: '#065F46',
+    color: '#1E40AF',
   },
   successRefValue: {
     fontFamily: Fonts.mono,
     fontSize: 20,
     fontWeight: '800',
-    color: '#0A5C36',
+    color: '#1D4ED8',
     marginTop: 4,
     letterSpacing: 1,
   },
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   newGrievanceBtn: {
-    backgroundColor: '#0A5C36',
+    backgroundColor: '#1D4ED8',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 10,

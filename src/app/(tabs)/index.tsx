@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -12,28 +12,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { Palette, Fonts, MUNICIPAL_HEADER } from '@/constants/theme';
+import { Fonts, Palette, MUNICIPAL_HEADER } from '@/constants/theme';
 import { useCBHIStore } from '@/stores/cbhi-store';
 
 export default function DigitalCardScreen() {
-  const {
-    member,
-    selectDemoProfile,
-    renewMembership,
-    isRenewing,
-  } = useCBHIStore();
-
-  const [qrTimestamp, setQrTimestamp] = useState<number>(Date.now());
+  const { member, renewMembership, isRenewing } = useCBHIStore();
   const [showRenewalModal, setShowRenewalModal] = useState<boolean>(false);
   const [selectedDependent, setSelectedDependent] = useState<any | null>(null);
-
-  // Dynamic rotating hash for anti-fraud QR code
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setQrTimestamp(Date.now());
-    }, 15000);
-    return () => clearInterval(timer);
-  }, []);
 
   const qrData = JSON.stringify({
     scheme: 'NSL-CBHI',
@@ -42,25 +27,23 @@ export default function DigitalCardScreen() {
     woreda: member.woreda,
     status: member.policyStatus,
     expires: member.validUntil,
-    ts: qrTimestamp,
-    sig: `NSL-SEAL-${member.memberId.slice(-4)}-${qrTimestamp.toString().slice(-4)}`,
   });
 
-  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=4&data=${encodeURIComponent(
+  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=6&data=${encodeURIComponent(
     qrData
   )}`;
 
-  const isSubsidized = member.policyType === 'INDIGENT_SUBSIDIZED';
   const isExpired = member.policyStatus === 'EXPIRED';
+  const isSubsidized = member.policyType === 'INDIGENT_SUBSIDIZED';
 
   const handleRenew = async (channel: 'TELEBIRR' | 'CBE_BIRR') => {
     try {
       await renewMembership(channel);
       setShowRenewalModal(false);
       Alert.alert(
-        'የአባልነት ክፍያ ተከናውኗል!',
-        `በ ${channel === 'TELEBIRR' ? 'ቴሌብር (telebirr)' : 'ሲቢኢ ብር (CBE Birr)'} በኩል የ 750 ብር ክፍያ ተረጋግጧል። አባልነትዎ እስከ ታህሳስ 2026 ታድሷል።`,
-        [{ text: 'እሺ', style: 'default' }]
+        'የአባልነት ክፍያ ተከናውኗል',
+        `በ ${channel === 'TELEBIRR' ? 'ቴሌብር (telebirr)' : 'ሲቢኢ ብር (CBE Birr)'} በኩል 750.00 ብር ተከፍሏል። አባልነትዎ እስከ ታህሳስ 2026 ታድሷል።`,
+        [{ text: 'እሺ' }]
       );
     } catch {
       Alert.alert('ስህተት', 'ክፍያውን ማጠናቀቅ አልተቻለም። እባክዎ እንደገና ይሞክሩ።');
@@ -69,211 +52,155 @@ export default function DigitalCardScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      {/* Top Municipal Subcity Branding */}
+      {/* Official Municipal Header */}
       <View style={styles.topBar}>
         <View style={styles.topBarLeft}>
-          <View style={styles.flagBadge}>
-            <View style={[styles.flagStrip, { backgroundColor: '#059669' }]} />
-            <View style={[styles.flagStrip, { backgroundColor: '#FBBF24' }]} />
-            <View style={[styles.flagStrip, { backgroundColor: '#DC2626' }]} />
+          <View style={styles.logoBadge}>
+            <Ionicons name="shield-checkmark" size={18} color="#FFFFFF" />
           </View>
           <View>
-            <Text style={styles.subcityAmText}>{MUNICIPAL_HEADER.subcityAm}</Text>
-            <Text style={styles.officeEnText}>Health Office • CBHI Digital Card</Text>
+            <Text style={styles.subcityText}>{MUNICIPAL_HEADER.subcityAm}</Text>
+            <Text style={styles.officeText}>የጤና ጽ/ቤት • የማህበረሰብ አቀፍ ጤና መድህን</Text>
           </View>
         </View>
 
-        <View style={styles.offlinePill}>
-          <Ionicons name="shield-checkmark" size={13} color="#10B981" />
-          <Text style={styles.offlinePillText}>Offline Verified</Text>
+        <View style={styles.statusPill}>
+          <View style={[styles.statusDot, isExpired && { backgroundColor: '#DC2626' }]} />
+          <Text style={[styles.statusPillText, isExpired && { color: '#DC2626' }]}>
+            {isExpired ? 'ያለቀበት' : isSubsidized ? 'ድጎማ' : 'ጸድቋል'}
+          </Text>
         </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Quick Demo Switcher for Evaluation */}
-        <View style={styles.demoSwitcher}>
-          <Text style={styles.demoSwitcherLabel}>የአባልነት ሁኔታ ይምረጡ (Demo Persona):</Text>
-          <View style={styles.demoRow}>
-            <TouchableOpacity
-              style={[
-                styles.demoBtn,
-                !isSubsidized && !isExpired && styles.demoBtnActive,
-              ]}
-              onPress={() => selectDemoProfile('active')}
-            >
-              <Text
-                style={[
-                  styles.demoBtnText,
-                  !isSubsidized && !isExpired && styles.demoBtnTextActive,
-                ]}
-              >
-                አክቲቭ (750 ብር)
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.demoBtn,
-                isSubsidized && styles.demoBtnActiveSubsidized,
-              ]}
-              onPress={() => selectDemoProfile('subsidized')}
-            >
-              <Text
-                style={[
-                  styles.demoBtnText,
-                  isSubsidized && styles.demoBtnTextActiveSubsidized,
-                ]}
-              >
-                100% ድጎማ (ደሃ)
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.demoBtn, isExpired && styles.demoBtnActiveExpired]}
-              onPress={() => selectDemoProfile('expired')}
-            >
-              <Text
-                style={[
-                  styles.demoBtnText,
-                  isExpired && styles.demoBtnTextActiveExpired,
-                ]}
-              >
-                ያለቀበት (Renew)
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
         {/* =========================================================================
-            PRIMARY DIGITAL CBHI CARD
+            MODERN ROYAL BLUE CBHI DIGITAL CARD
             ========================================================================= */}
-        <View
-          style={[
-            styles.cardWrapper,
-            isSubsidized && styles.cardWrapperSubsidized,
-            isExpired && styles.cardWrapperExpired,
-          ]}
-        >
-          {/* Card Top Header */}
+        <View style={[styles.cardWrapper, isExpired && styles.cardWrapperExpired]}>
+          {/* Card Top Title Row */}
           <View style={styles.cardHeader}>
-            <View style={styles.cardHeaderTitleRow}>
-              <Ionicons name="medical" size={20} color="#10B981" />
-              <View style={{ marginLeft: 8 }}>
-                <Text style={styles.cardHeaderTitleAm}>የማህበረሰብ አቀፍ ጤና መድህን</Text>
-                <Text style={styles.cardHeaderTitleEn}>COMMUNITY BASED HEALTH INSURANCE</Text>
-              </View>
+            <View style={styles.cardHeaderLeft}>
+              <Text style={styles.cardHeaderSub}>ETHIOPIAN COMMUNITY HEALTH INSURANCE</Text>
+              <Text style={styles.cardHeaderTitle}>ዲጂታል የጤና መድህን ካርድ</Text>
             </View>
-
-            {/* Status Badge */}
-            <View
-              style={[
-                styles.statusBadge,
-                isSubsidized && styles.statusBadgeSubsidized,
-                isExpired && styles.statusBadgeExpired,
-              ]}
-            >
-              <View
-                style={[
-                  styles.statusDot,
-                  isSubsidized && { backgroundColor: '#D97706' },
-                  isExpired && { backgroundColor: '#DC2626' },
-                ]}
-              />
-              <Text
-                style={[
-                  styles.statusBadgeText,
-                  isSubsidized && { color: '#B45309' },
-                  isExpired && { color: '#DC2626' },
-                ]}
-              >
-                {isExpired ? 'ያለቀበት (EXPIRED)' : isSubsidized ? '100% ድጎማ (SUBSIDIZED)' : 'ጸድቋል (ACTIVE)'}
-              </Text>
+            <View style={styles.nationalEmblemBox}>
+              <Ionicons name="medkit" size={20} color="#BFDBFE" />
             </View>
           </View>
 
-          {/* Member Details & Photo */}
+          {/* Member Photo & Primary Information */}
           <View style={styles.cardBody}>
             <Image source={{ uri: member.photoUrl }} style={styles.memberPhoto} />
-            <View style={styles.memberDetails}>
+            <View style={styles.memberInfo}>
               <Text style={styles.memberNameAm}>{member.fullNameAm}</Text>
               <Text style={styles.memberNameEn}>{member.fullNameEn}</Text>
 
               <View style={styles.idChip}>
-                <Text style={styles.idChipLabel}>መታወቂያ / ID:</Text>
+                <Text style={styles.idChipLabel}>ID:</Text>
                 <Text style={styles.idChipVal}>{member.memberId}</Text>
               </View>
 
               <View style={styles.metaRow}>
-                <Text style={styles.metaLabel}>ወረዳ (Woreda):</Text>
+                <Text style={styles.metaLabel}>ወረዳ:</Text>
                 <Text style={styles.metaVal}>{member.woreda}</Text>
               </View>
               <View style={styles.metaRow}>
-                <Text style={styles.metaLabel}>አገልግሎት የሚያበቃበት:</Text>
-                <Text style={[styles.metaVal, isExpired && { color: '#EF4444', fontWeight: '700' }]}>
+                <Text style={styles.metaLabel}>የሚያበቃበት ቀን:</Text>
+                <Text style={[styles.metaVal, isExpired && { color: '#FCA5A5' }]}>
                   {member.validUntil}
                 </Text>
               </View>
             </View>
           </View>
 
-          {/* Dynamic Anti-Fraud QR Code Section */}
+          {/* QR Code Verification Section */}
           <View style={styles.qrSection}>
             <View style={styles.qrContainer}>
               <Image source={{ uri: qrImageUrl }} style={styles.qrImage} />
             </View>
-            <View style={styles.qrInfo}>
-              <View style={styles.dynamicRow}>
-                <View style={styles.pulseDot} />
-                <Text style={styles.qrSecurityLabel}>ፀረ-ማጭበርበር ቅጽበታዊ ኮድ (Anti-Fraud)</Text>
+            <View style={styles.qrTextCol}>
+              <Text style={styles.qrTitle}>የጤና ጣቢያ ፈጣን ማረጋገጫ</Text>
+              <Text style={styles.qrSubtitle}>
+                በጤና ጣቢያው ትሪያጅ ወይም ፋርማሲ ሲቀርብ የታካሚውን ህጋዊ የአባልነት መረጃ በቀጥታ ያረጋግጣል።
+              </Text>
+              <View style={styles.verifiedRow}>
+                <Ionicons name="checkmark-circle" size={14} color="#60A5FA" />
+                <Text style={styles.verifiedText}>Nifas Silk Lafto CBHI Certified</Text>
               </View>
-              <Text style={styles.qrSecurityDesc}>
-                በጤና ጣቢያው ትሪያጅ ካሜራ ሲነበብ የቤተሰብ አባላትና የክፍያ ታሪክ በቀጥታ ያረጋግጣል።
-              </Text>
-              <Text style={styles.qrTimestampText}>
-                ሲስተም ማረጋገጫ: {new Date(qrTimestamp).toLocaleTimeString()} • 15s ራስ-ሰር እድሳት
-              </Text>
             </View>
           </View>
 
           {/* Primary Assigned Health Center */}
           <View style={styles.clinicFooter}>
-            <Ionicons name="location-sharp" size={16} color="#10B981" />
-            <View style={{ flex: 1, marginLeft: 6 }}>
-              <Text style={styles.clinicNameAm}>{member.assignedHealthCenter.nameAm}</Text>
-              <Text style={styles.clinicDetails}>
-                {member.assignedHealthCenter.tier} • ስልክ: {member.assignedHealthCenter.phone}
+            <Ionicons name="location" size={16} color="#93C5FD" />
+            <View style={{ flex: 1, marginLeft: 8 }}>
+              <Text style={styles.clinicName}>{member.assignedHealthCenter.nameAm}</Text>
+              <Text style={styles.clinicContact}>
+                {member.assignedHealthCenter.tier} • {member.assignedHealthCenter.phone}
               </Text>
             </View>
           </View>
         </View>
 
-        {/* Expired Warning Banner & 1-Click Renewal */}
+        {/* Expired Action Banner */}
         {isExpired && (
           <View style={styles.renewBanner}>
             <Ionicons name="alert-circle" size={24} color="#DC2626" />
             <View style={{ flex: 1, marginLeft: 10 }}>
-              <Text style={styles.renewBannerTitle}>የጤና መድህን አባልነትዎ ጊዜ አልፎበታል!</Text>
+              <Text style={styles.renewBannerTitle}>የአባልነት ጊዜ አልፎበታል</Text>
               <Text style={styles.renewBannerSub}>
                 ያለክፍያ ህክምና ለማግኘት አመታዊ መዋጮዎን በቴሌብር ወይም በሲቢኢ ብር ያድሱ።
               </Text>
             </View>
             <TouchableOpacity style={styles.renewBtn} onPress={() => setShowRenewalModal(true)}>
-              <Text style={styles.renewBtnText}>አሁን እደስ</Text>
+              <Text style={styles.renewBtnText}>እደስ</Text>
             </TouchableOpacity>
           </View>
         )}
 
+        {/* Quick Actions Row */}
+        <View style={styles.actionGrid}>
+          <TouchableOpacity
+            style={styles.actionCard}
+            onPress={() => setShowRenewalModal(true)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.actionIconBox, { backgroundColor: '#EFF6FF' }]}>
+              <Ionicons name="wallet-outline" size={20} color="#1D4ED8" />
+            </View>
+            <Text style={styles.actionTitle}>መዋጮ ክፍያ</Text>
+            <Text style={styles.actionSub}>Telebirr / CBE</Text>
+          </TouchableOpacity>
+
+          <View style={styles.actionCard}>
+            <View style={[styles.actionIconBox, { backgroundColor: '#F0FDF4' }]}>
+              <Ionicons name="medical-outline" size={20} color="#059669" />
+            </View>
+            <Text style={styles.actionTitle}>የህክምና ሽፋን</Text>
+            <Text style={styles.actionSub}>100% ነፃ ሽፋን</Text>
+          </View>
+
+          <View style={styles.actionCard}>
+            <View style={[styles.actionIconBox, { backgroundColor: '#FEF3C7' }]}>
+              <Ionicons name="document-text-outline" size={20} color="#D97706" />
+            </View>
+            <Text style={styles.actionTitle}>ፖሊሲ ሁኔታ</Text>
+            <Text style={styles.actionSub}>{member.policyStatus}</Text>
+          </View>
+        </View>
+
         {/* =========================================================================
             COVERED FAMILY DEPENDENTS
             ========================================================================= */}
-        <View style={styles.sectionHeaderRow}>
+        <View style={styles.sectionHeader}>
           <View>
-            <Text style={styles.sectionTitleAm}>የተመዘገቡ የቤተሰብ አባላት (ጥገኞች)</Text>
-            <Text style={styles.sectionTitleEn}>Covered Household Dependents ({member.dependents.length})</Text>
+            <Text style={styles.sectionTitle}>የተመዘገቡ የቤተሰብ አባላት</Text>
+            <Text style={styles.sectionSubtitle}>
+              በዚህ ካርድ ስር የተካተቱ ጥገኞች ({member.dependents.length})
+            </Text>
           </View>
-          <View style={styles.coveredAllPill}>
-            <Ionicons name="checkmark-circle" size={14} color="#059669" />
-            <Text style={styles.coveredAllText}>100% ነጻ ህክምና</Text>
+          <View style={styles.countBadge}>
+            <Text style={styles.countBadgeText}>{member.dependents.length} ጥገኞች</Text>
           </View>
         </View>
 
@@ -283,46 +210,25 @@ export default function DigitalCardScreen() {
               key={dep.id}
               style={styles.depCard}
               onPress={() => setSelectedDependent(dep)}
-              activeOpacity={0.8}
+              activeOpacity={0.7}
             >
               {dep.photoUrl ? (
                 <Image source={{ uri: dep.photoUrl }} style={styles.depPhoto} />
               ) : (
-                <View style={styles.depAvatarFallback}>
-                  <Ionicons name="person" size={22} color="#0A5C36" />
+                <View style={styles.depFallback}>
+                  <Ionicons name="person" size={20} color="#1D4ED8" />
                 </View>
               )}
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.depNameAm}>{dep.nameAm}</Text>
+                <Text style={styles.depName}>{dep.nameAm}</Text>
                 <Text style={styles.depNameEn}>{dep.nameEn}</Text>
-                <Text style={styles.depMeta}>
+                <Text style={styles.depInfo}>
                   እድሜ: {dep.age} ዓመት • ጾታ: {dep.gender === 'F' ? 'ሴት' : 'ወንድ'}
                 </Text>
               </View>
-              <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+              <Ionicons name="chevron-forward" size={16} color="#94A3B8" />
             </TouchableOpacity>
           ))}
-        </View>
-
-        {/* Benefits Quick Strip */}
-        <View style={styles.benefitsStrip}>
-          <View style={styles.benefitItem}>
-            <Ionicons name="bandage-outline" size={22} color="#0A5C36" />
-            <Text style={styles.benefitTitle}>የመድሃኒት ሽፋን</Text>
-            <Text style={styles.benefitDesc}>ሙሉ በሙሉ ነፃ</Text>
-          </View>
-          <View style={styles.benefitDivider} />
-          <View style={styles.benefitItem}>
-            <Ionicons name="flask-outline" size={22} color="#0A5C36" />
-            <Text style={styles.benefitTitle}>ላቦራቶሪ / ኤክስሬይ</Text>
-            <Text style={styles.benefitDesc}>በሪፈራል የተሸፈነ</Text>
-          </View>
-          <View style={styles.benefitDivider} />
-          <View style={styles.benefitItem}>
-            <Ionicons name="bed-outline" size={22} color="#0A5C36" />
-            <Text style={styles.benefitTitle}>የአልጋና የቀዶ ህክምና</Text>
-            <Text style={styles.benefitDesc}>በአለርት ሆስፒታል</Text>
-          </View>
         </View>
       </ScrollView>
 
@@ -334,53 +240,53 @@ export default function DigitalCardScreen() {
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
               <View>
-                <Text style={styles.modalTitleAm}>የጤና መድህን መዋጮ ማደሻ</Text>
-                <Text style={styles.modalTitleEn}>Annual Contribution Renewal (2026/27)</Text>
+                <Text style={styles.modalTitle}>አመታዊ የጤና መድህን መዋጮ</Text>
+                <Text style={styles.modalSub}>Annual CBHI Contribution Renewal</Text>
               </View>
               <TouchableOpacity onPress={() => setShowRenewalModal(false)}>
-                <Ionicons name="close-circle" size={26} color="#64748B" />
+                <Ionicons name="close" size={24} color="#64748B" />
               </TouchableOpacity>
             </View>
 
             <View style={styles.modalBillBox}>
-              <Text style={styles.billLabel}>አመታዊ መዋጮ (ጠቅላላ ቤተሰብ):</Text>
+              <Text style={styles.billLabel}>አመታዊ የመዋጮ መጠን:</Text>
               <Text style={styles.billAmount}>750.00 ETB</Text>
-              <Text style={styles.billHousehold}>የንፋስ ስልክ ላፍቶ ወረዳ 03 ማህበረሰብ</Text>
+              <Text style={styles.billHousehold}>ለሙሉ ቤተሰብ የ 1 ዓመት የጤና ሽፋን</Text>
             </View>
 
             {isRenewing ? (
-              <View style={styles.renewingBox}>
-                <ActivityIndicator size="large" color="#0A5C36" />
-                <Text style={styles.renewingText}>ከክፍያ ጌትዌይ ጋር በመገናኘት ላይ ነው...</Text>
+              <View style={styles.loadingBox}>
+                <ActivityIndicator size="large" color="#1D4ED8" />
+                <Text style={styles.loadingText}>ክፍያው በመረጋገጥ ላይ ነው...</Text>
               </View>
             ) : (
               <View style={styles.paymentMethods}>
                 <TouchableOpacity
-                  style={styles.telebirrBtn}
+                  style={styles.paymentMethodBtn}
                   onPress={() => handleRenew('TELEBIRR')}
                 >
-                  <View style={styles.telebirrLogoPill}>
-                    <Text style={styles.telebirrLogoText}>telebirr</Text>
+                  <View style={[styles.channelLogo, { backgroundColor: '#0284C7' }]}>
+                    <Text style={styles.channelText}>telebirr</Text>
                   </View>
                   <View style={{ flex: 1, marginLeft: 12 }}>
-                    <Text style={styles.paymentMethodTitle}>በቴሌብር ይክፈሉ</Text>
-                    <Text style={styles.paymentMethodSub}>1-Click Direct Merchant Pin</Text>
+                    <Text style={styles.paymentMethodName}>በቴሌብር ይክፈሉ</Text>
+                    <Text style={styles.paymentMethodSub}>ፈጣን ቀጥታ ክፍያ</Text>
                   </View>
-                  <Ionicons name="arrow-forward" size={18} color="#0284C7" />
+                  <Ionicons name="arrow-forward" size={18} color="#1D4ED8" />
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={styles.cbeBtn}
+                  style={styles.paymentMethodBtn}
                   onPress={() => handleRenew('CBE_BIRR')}
                 >
-                  <View style={styles.cbeLogoPill}>
-                    <Text style={styles.cbeLogoText}>CBE</Text>
+                  <View style={[styles.channelLogo, { backgroundColor: '#854D0E' }]}>
+                    <Text style={styles.channelText}>CBE</Text>
                   </View>
                   <View style={{ flex: 1, marginLeft: 12 }}>
-                    <Text style={styles.paymentMethodTitle}>በሲቢኢ ብር (CBE Birr)</Text>
-                    <Text style={styles.paymentMethodSub}>Commercial Bank of Ethiopia</Text>
+                    <Text style={styles.paymentMethodName}>በሲቢኢ ብር (CBE Birr)</Text>
+                    <Text style={styles.paymentMethodSub}>የኢትዮጵያ ንግድ ባንክ</Text>
                   </View>
-                  <Ionicons name="arrow-forward" size={18} color="#854D0E" />
+                  <Ionicons name="arrow-forward" size={18} color="#1D4ED8" />
                 </TouchableOpacity>
               </View>
             )}
@@ -389,45 +295,45 @@ export default function DigitalCardScreen() {
       </Modal>
 
       {/* =========================================================================
-          DEPENDENT DETAILS MODAL
+          DEPENDENT MODAL
           ========================================================================= */}
       <Modal visible={!!selectedDependent} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
               <View>
-                <Text style={styles.modalTitleAm}>የጥገኛ መረጃ ዝርዝር</Text>
-                <Text style={styles.modalTitleEn}>Household Beneficiary Card</Text>
+                <Text style={styles.modalTitle}>የጥገኛ መረጃ</Text>
+                <Text style={styles.modalSub}>Family Beneficiary</Text>
               </View>
               <TouchableOpacity onPress={() => setSelectedDependent(null)}>
-                <Ionicons name="close-circle" size={26} color="#64748B" />
+                <Ionicons name="close" size={24} color="#64748B" />
               </TouchableOpacity>
             </View>
 
             {selectedDependent && (
-              <View style={styles.depModalBody}>
+              <View style={styles.depModalContent}>
                 {selectedDependent.photoUrl ? (
                   <Image source={{ uri: selectedDependent.photoUrl }} style={styles.depModalPhoto} />
                 ) : (
-                  <View style={[styles.depAvatarFallback, { width: 70, height: 70, borderRadius: 35 }]}>
-                    <Ionicons name="person" size={36} color="#0A5C36" />
+                  <View style={styles.depModalFallback}>
+                    <Ionicons name="person" size={32} color="#1D4ED8" />
                   </View>
                 )}
                 <Text style={styles.depModalName}>{selectedDependent.nameAm}</Text>
                 <Text style={styles.depModalNameEn}>{selectedDependent.nameEn}</Text>
 
-                <View style={styles.depBadgeRow}>
-                  <View style={styles.depPill}>
-                    <Text style={styles.depPillText}>ዝምድና: {selectedDependent.relationship}</Text>
+                <View style={styles.depModalPills}>
+                  <View style={styles.depModalPill}>
+                    <Text style={styles.depModalPillText}>ዝምድና: {selectedDependent.relationship}</Text>
                   </View>
-                  <View style={styles.depPill}>
-                    <Text style={styles.depPillText}>እድሜ: {selectedDependent.age} ዓመት</Text>
+                  <View style={styles.depModalPill}>
+                    <Text style={styles.depModalPillText}>እድሜ: {selectedDependent.age} ዓመት</Text>
                   </View>
                 </View>
 
-                <View style={styles.depCheckAlert}>
-                  <Ionicons name="shield-checkmark" size={18} color="#059669" />
-                  <Text style={styles.depCheckText}>
+                <View style={styles.depConfirmNotice}>
+                  <Ionicons name="shield-checkmark" size={18} color="#1D4ED8" />
+                  <Text style={styles.depConfirmText}>
                     በዋናው አባል መታወቂያ ({member.memberId}) ስር በንፋስ ስልክ ጤና ጣቢያ ነፃ ህክምና እንዲያገኝ የተፈቀደለት ነው።
                   </Text>
                 </View>
@@ -459,121 +365,63 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  flagBadge: {
-    width: 14,
-    height: 28,
-    borderRadius: 3,
-    overflow: 'hidden',
+  logoBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#1D4ED8',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 10,
-    justifyContent: 'space-between',
   },
-  flagStrip: {
-    flex: 1,
-    width: '100%',
-  },
-  subcityAmText: {
+  subcityText: {
     fontFamily: Fonts.bold,
     fontSize: 13,
     color: '#0F172A',
   },
-  officeEnText: {
+  officeText: {
     fontFamily: Fonts.regular,
     fontSize: 11,
     color: '#64748B',
   },
-  offlinePill: {
+  statusPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ECFDF5',
-    paddingHorizontal: 8,
+    backgroundColor: '#EFF6FF',
+    paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#A7F3D0',
-    gap: 4,
+    borderColor: '#BFDBFE',
+    gap: 5,
   },
-  offlinePillText: {
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#2563EB',
+  },
+  statusPillText: {
     fontFamily: Fonts.medium,
-    fontSize: 10,
-    color: '#047857',
+    fontSize: 11,
+    color: '#1D4ED8',
   },
   scrollContent: {
     padding: 16,
     paddingBottom: 36,
   },
-  demoSwitcher: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 10,
-    marginBottom: 14,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-  },
-  demoSwitcherLabel: {
-    fontFamily: Fonts.medium,
-    fontSize: 11,
-    color: '#64748B',
-    marginBottom: 6,
-  },
-  demoRow: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  demoBtn: {
-    flex: 1,
-    paddingVertical: 6,
-    paddingHorizontal: 4,
-    borderRadius: 6,
-    backgroundColor: '#F1F5F9',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  demoBtnActive: {
-    backgroundColor: '#ECFDF5',
-    borderColor: '#10B981',
-  },
-  demoBtnActiveSubsidized: {
-    backgroundColor: '#FEF3C7',
-    borderColor: '#D97706',
-  },
-  demoBtnActiveExpired: {
-    backgroundColor: '#FEE2E2',
-    borderColor: '#DC2626',
-  },
-  demoBtnText: {
-    fontFamily: Fonts.medium,
-    fontSize: 10,
-    color: '#475569',
-  },
-  demoBtnTextActive: {
-    color: '#047857',
-    fontWeight: '700',
-  },
-  demoBtnTextActiveSubsidized: {
-    color: '#B45309',
-    fontWeight: '700',
-  },
-  demoBtnTextActiveExpired: {
-    color: '#B91C1C',
-    fontWeight: '700',
-  },
   cardWrapper: {
-    backgroundColor: '#052E16',
+    backgroundColor: '#1E3A8A', // Deep Royal Navy Blue
     borderRadius: 18,
     padding: 18,
-    shadowColor: '#0A5C36',
+    shadowColor: '#1D4ED8',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.16,
     shadowRadius: 12,
     elevation: 6,
-    borderWidth: 1.5,
-    borderColor: '#10B981',
+    borderWidth: 1,
+    borderColor: '#3B82F6',
     marginBottom: 16,
-  },
-  cardWrapperSubsidized: {
-    backgroundColor: '#3B2F04',
-    borderColor: '#F59E0B',
   },
   cardWrapperExpired: {
     backgroundColor: '#3F1212',
@@ -585,49 +433,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.15)',
-    paddingBottom: 12,
+    paddingBottom: 10,
     marginBottom: 14,
   },
-  cardHeaderTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  cardHeaderLeft: {
+    flex: 1,
   },
-  cardHeaderTitleAm: {
-    fontFamily: Fonts.bold,
-    fontSize: 12,
-    color: '#FFFFFF',
-  },
-  cardHeaderTitleEn: {
+  cardHeaderSub: {
     fontFamily: Fonts.regular,
-    fontSize: 8.5,
-    color: '#A7F3D0',
+    fontSize: 9,
+    color: '#BFDBFE',
     letterSpacing: 0.5,
   },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ECFDF5',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    gap: 5,
-  },
-  statusBadgeSubsidized: {
-    backgroundColor: '#FEF3C7',
-  },
-  statusBadgeExpired: {
-    backgroundColor: '#FEE2E2',
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#10B981',
-  },
-  statusBadgeText: {
+  cardHeaderTitle: {
     fontFamily: Fonts.bold,
-    fontSize: 10,
-    color: '#047857',
+    fontSize: 13,
+    color: '#FFFFFF',
+    marginTop: 2,
+  },
+  nationalEmblemBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cardBody: {
     flexDirection: 'row',
@@ -642,7 +472,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
     backgroundColor: '#CBD5E1',
   },
-  memberDetails: {
+  memberInfo: {
     flex: 1,
     marginLeft: 14,
   },
@@ -654,13 +484,13 @@ const styles = StyleSheet.create({
   memberNameEn: {
     fontFamily: Fonts.regular,
     fontSize: 12,
-    color: '#CBD5E1',
+    color: '#DBEAFE',
     marginBottom: 6,
   },
   idChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
@@ -670,7 +500,7 @@ const styles = StyleSheet.create({
   idChipLabel: {
     fontFamily: Fonts.regular,
     fontSize: 10,
-    color: '#A7F3D0',
+    color: '#BFDBFE',
     marginRight: 4,
   },
   idChipVal: {
@@ -686,17 +516,17 @@ const styles = StyleSheet.create({
   metaLabel: {
     fontFamily: Fonts.regular,
     fontSize: 10.5,
-    color: '#94A3B8',
+    color: '#93C5FD',
   },
   metaVal: {
     fontFamily: Fonts.medium,
     fontSize: 11,
-    color: '#F1F5F9',
+    color: '#FFFFFF',
   },
   qrSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    backgroundColor: 'rgba(0, 0, 0, 0.22)',
     borderRadius: 12,
     padding: 10,
     marginBottom: 12,
@@ -707,41 +537,35 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   qrImage: {
-    width: 82,
-    height: 82,
+    width: 78,
+    height: 78,
   },
-  qrInfo: {
+  qrTextCol: {
     flex: 1,
     marginLeft: 12,
   },
-  dynamicRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 3,
-  },
-  pulseDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#10B981',
-    marginRight: 5,
-  },
-  qrSecurityLabel: {
+  qrTitle: {
     fontFamily: Fonts.bold,
-    fontSize: 10,
-    color: '#A7F3D0',
+    fontSize: 11,
+    color: '#FFFFFF',
   },
-  qrSecurityDesc: {
+  qrSubtitle: {
     fontFamily: Fonts.regular,
     fontSize: 9.5,
-    color: '#E2E8F0',
+    color: '#DBEAFE',
     lineHeight: 13,
+    marginTop: 2,
   },
-  qrTimestampText: {
-    fontFamily: Fonts.regular,
-    fontSize: 8.5,
-    color: '#94A3B8',
-    marginTop: 4,
+  verifiedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
+    gap: 4,
+  },
+  verifiedText: {
+    fontFamily: Fonts.medium,
+    fontSize: 9,
+    color: '#93C5FD',
   },
   clinicFooter: {
     flexDirection: 'row',
@@ -750,15 +574,15 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
   },
-  clinicNameAm: {
+  clinicName: {
     fontFamily: Fonts.bold,
     fontSize: 12,
     color: '#FFFFFF',
   },
-  clinicDetails: {
+  clinicContact: {
     fontFamily: Fonts.regular,
     fontSize: 10,
-    color: '#CBD5E1',
+    color: '#BFDBFE',
   },
   renewBanner: {
     flexDirection: 'row',
@@ -792,47 +616,77 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#FFFFFF',
   },
-  sectionHeaderRow: {
+  actionGrid: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 20,
+  },
+  actionCard: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    alignItems: 'center',
+  },
+  actionIconBox: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+  },
+  actionTitle: {
+    fontFamily: Fonts.bold,
+    fontSize: 11,
+    color: '#0F172A',
+  },
+  actionSub: {
+    fontFamily: Fonts.regular,
+    fontSize: 10,
+    color: '#64748B',
+    marginTop: 1,
+  },
+  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
-    marginTop: 6,
+    marginBottom: 12,
   },
-  sectionTitleAm: {
+  sectionTitle: {
     fontFamily: Fonts.bold,
     fontSize: 15,
     color: '#0F172A',
   },
-  sectionTitleEn: {
+  sectionSubtitle: {
     fontFamily: Fonts.regular,
     fontSize: 11,
     color: '#64748B',
   },
-  coveredAllPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ECFDF5',
+  countBadge: {
+    backgroundColor: '#EFF6FF',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 10,
-    gap: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
   },
-  coveredAllText: {
-    fontFamily: Fonts.medium,
-    fontSize: 10,
-    color: '#047857',
+  countBadgeText: {
+    fontFamily: Fonts.bold,
+    fontSize: 10.5,
+    color: '#1D4ED8',
   },
   dependentsList: {
-    gap: 8,
-    marginBottom: 18,
+    gap: 10,
   },
   depCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    padding: 10,
+    padding: 12,
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
@@ -842,15 +696,15 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     backgroundColor: '#E2E8F0',
   },
-  depAvatarFallback: {
+  depFallback: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EFF6FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  depNameAm: {
+  depName: {
     fontFamily: Fonts.bold,
     fontSize: 13,
     color: '#0F172A',
@@ -860,48 +714,15 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#64748B',
   },
-  depMeta: {
+  depInfo: {
     fontFamily: Fonts.regular,
     fontSize: 10,
     color: '#94A3B8',
     marginTop: 2,
   },
-  benefitsStrip: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    alignItems: 'center',
-  },
-  benefitItem: {
-    flex: 1,
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-  benefitTitle: {
-    fontFamily: Fonts.bold,
-    fontSize: 11,
-    color: '#0F172A',
-    marginTop: 6,
-    textAlign: 'center',
-  },
-  benefitDesc: {
-    fontFamily: Fonts.regular,
-    fontSize: 9.5,
-    color: '#10B981',
-    marginTop: 2,
-    textAlign: 'center',
-  },
-  benefitDivider: {
-    width: 1,
-    height: 36,
-    backgroundColor: '#E2E8F0',
-  },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
   modalCard: {
@@ -917,12 +738,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  modalTitleAm: {
+  modalTitle: {
     fontFamily: Fonts.bold,
     fontSize: 16,
     color: '#0F172A',
   },
-  modalTitleEn: {
+  modalSub: {
     fontFamily: Fonts.regular,
     fontSize: 11,
     color: '#64748B',
@@ -930,7 +751,7 @@ const styles = StyleSheet.create({
   modalBillBox: {
     backgroundColor: '#F8FAFC',
     borderRadius: 14,
-    padding: 14,
+    padding: 16,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#E2E8F0',
@@ -944,38 +765,47 @@ const styles = StyleSheet.create({
   billAmount: {
     fontFamily: Fonts.bold,
     fontSize: 28,
-    color: '#0A5C36',
+    color: '#1D4ED8',
     marginVertical: 4,
   },
   billHousehold: {
     fontFamily: Fonts.medium,
     fontSize: 11,
-    color: '#0F172A',
+    color: '#334155',
+  },
+  loadingBox: {
+    paddingVertical: 24,
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontFamily: Fonts.medium,
+    fontSize: 12,
+    color: '#1D4ED8',
+    marginTop: 8,
   },
   paymentMethods: {
     gap: 10,
   },
-  telebirrBtn: {
+  paymentMethodBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F0F9FF',
+    backgroundColor: '#F8FAFC',
     borderWidth: 1,
-    borderColor: '#BAE6FD',
+    borderColor: '#E2E8F0',
     borderRadius: 12,
     padding: 12,
   },
-  telebirrLogoPill: {
-    backgroundColor: '#0284C7',
+  channelLogo: {
     paddingHorizontal: 8,
     paddingVertical: 5,
     borderRadius: 6,
   },
-  telebirrLogoText: {
+  channelText: {
     color: '#FFFFFF',
     fontWeight: '800',
     fontSize: 11,
   },
-  paymentMethodTitle: {
+  paymentMethodName: {
     fontFamily: Fonts.bold,
     fontSize: 13,
     color: '#0F172A',
@@ -985,37 +815,7 @@ const styles = StyleSheet.create({
     fontSize: 10.5,
     color: '#64748B',
   },
-  cbeBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FEFCE8',
-    borderWidth: 1,
-    borderColor: '#FEF08A',
-    borderRadius: 12,
-    padding: 12,
-  },
-  cbeLogoPill: {
-    backgroundColor: '#854D0E',
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 6,
-  },
-  cbeLogoText: {
-    color: '#FFFFFF',
-    fontWeight: '800',
-    fontSize: 11,
-  },
-  renewingBox: {
-    paddingVertical: 28,
-    alignItems: 'center',
-  },
-  renewingText: {
-    fontFamily: Fonts.medium,
-    fontSize: 12,
-    color: '#0A5C36',
-    marginTop: 10,
-  },
-  depModalBody: {
+  depModalContent: {
     alignItems: 'center',
     paddingVertical: 12,
   },
@@ -1024,7 +824,16 @@ const styles = StyleSheet.create({
     height: 76,
     borderRadius: 38,
     borderWidth: 2,
-    borderColor: '#10B981',
+    borderColor: '#1D4ED8',
+    marginBottom: 8,
+  },
+  depModalFallback: {
+    width: 76,
+    height: 76,
+    borderRadius: 38,
+    backgroundColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 8,
   },
   depModalName: {
@@ -1038,37 +847,37 @@ const styles = StyleSheet.create({
     color: '#64748B',
     marginBottom: 10,
   },
-  depBadgeRow: {
+  depModalPills: {
     flexDirection: 'row',
     gap: 8,
     marginBottom: 14,
   },
-  depPill: {
+  depModalPill: {
     backgroundColor: '#F1F5F9',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
   },
-  depPillText: {
+  depModalPillText: {
     fontFamily: Fonts.medium,
     fontSize: 11,
     color: '#334155',
   },
-  depCheckAlert: {
+  depConfirmNotice: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#EFF6FF',
     borderWidth: 1,
-    borderColor: '#A7F3D0',
+    borderColor: '#BFDBFE',
     borderRadius: 10,
     padding: 10,
     gap: 8,
   },
-  depCheckText: {
+  depConfirmText: {
     flex: 1,
     fontFamily: Fonts.regular,
     fontSize: 11,
-    color: '#065F46',
+    color: '#1E40AF',
     lineHeight: 16,
   },
 });
